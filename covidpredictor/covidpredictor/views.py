@@ -18,12 +18,9 @@ def home(request):
 def getPredictions():
 
     fitted_model = pickle.load(open("covidpredictor/model.sav", "rb"))
-    # scaled = pickle.load(open("scaler.sav", "rb"))
     df = pd.read_csv('covidpredictor/Covid 19 Confirmed Cases-Kerala.csv',index_col='Date',parse_dates=True)
     df.index.freq='D'
-    # print(len(df.loc['2020-06-01':]))
     prediction =fitted_model.predict(len(df.loc['2020-06-01':]),len(df.loc['2020-06-01':])+5,typ='levels')
-    print(prediction)
     return prediction
 # our result page view
 
@@ -46,7 +43,6 @@ def result(request):
     dailyCasesEdited_1 = dailyCasesUnedited[1:len(dailyCasesUnedited) - 1]
     dailyCases = dailyCasesEdited_1[1:]
     currentDate = str(date.today()-timedelta(days = 1))
-    print(currentDate)
     ####################################
     def updateCase(currentDate, dailyCases, oldDataList):
       f = open("covidpredictor/Covid 19 Confirmed Cases-Kerala.csv", "wt")
@@ -67,7 +63,6 @@ def result(request):
       list_of_lists = []
       for line in a_file:
         stripped_line = line.strip()
-        # line_list = stripped_line.split()
         list_of_lists.append(stripped_line)
 
       a_file.close()
@@ -85,8 +80,6 @@ def result(request):
     plt.plot(temp_df['Confirmed'],color='red',)
     plt.title('No of daily new cases from June 2020 till now in Kerela')
     plt.savefig('static/data.png')
-    # plt.show()
-    # print(len(temp_df))
 
     # MAKING ARIMA MODEL
 
@@ -99,42 +92,14 @@ def result(request):
     dates = getPredictions().index
     cases = getPredictions().to_list()
     data_list=[]
-    # print(dates)
     for i in range(0,len(cases)):
         data_list.append([dates[i].date().strftime('%Y-%m-%d'),cases[i]])
-    # for item in result:
-    gdate1 = temp_df.index[-10].date().strftime('%Y-%m-%d')
-    gdate2 = temp_df.index[-9].date().strftime('%Y-%m-%d')
-    gdate3 = temp_df.index[-8].date().strftime('%Y-%m-%d')
-    gdate4 = temp_df.index[-7].date().strftime('%Y-%m-%d')
-    gdate5 = temp_df.index[-6].date().strftime('%Y-%m-%d')
-    gdate6 = temp_df.index[-5].date().strftime('%Y-%m-%d')
-    gdate7 = temp_df.index[-4].date().strftime('%Y-%m-%d')
-    gdate8 = temp_df.index[-3].date().strftime('%Y-%m-%d')
-    gdate9 = temp_df.index[-2].date().strftime('%Y-%m-%d')
-    gdate10 = temp_df.index[-1].date().strftime('%Y-%m-%d')
-    # gdate11= temp_df.index[0].date().strftime('%Y-%m-%d')
-    #############
-    gresult1 = temp_df['Confirmed'][-10]
-    gresult2 = temp_df['Confirmed'][-9]
-    gresult3 = temp_df['Confirmed'][-8]
-    gresult4 = temp_df['Confirmed'][-7]
-    gresult5 = temp_df['Confirmed'][-6]
-    gresult6 = temp_df['Confirmed'][-5]
-    gresult7 = temp_df['Confirmed'][-4]
-    gresult8 = temp_df['Confirmed'][-3]
-    gresult9 = temp_df['Confirmed'][-2]
-    gresult10 = temp_df['Confirmed'][-1]
-    # gresult11= temp_df['Confirmed'][0]
-    print(gresult10)
     result1 = data_list[0][1]
     result2 = data_list[1][1]
     result3 = data_list[2][1]
     result4 = data_list[3][1]
     result5 = data_list[4][1]
-    print(data_list)
     date1 = data_list[0][0]
-
     date2 = data_list[1][0]
     date3 = data_list[2][0]
     date4 = data_list[3][0]
@@ -142,7 +107,5 @@ def result(request):
 
 
     return render(request, 'result.html', {'result1':result1,'result2':result2,'result3':result3,'result4':result4,'result5':result5,
-    'date1':date1,'date2':date2,'date3':date3,'date4':date4,'date5':date5,
-    'gdate1':gdate1,'gdate2':gdate2,'gdate3':gdate3,'gdate4':gdate4,'gdate5':gdate5,'gdate6':gdate6,'gdate7':gdate7,'gdate8':gdate8,'gdate9':gdate9,'gdate10':gdate10,
-    'gresult1':gresult1,'gresult2':gresult2,'gresult3':gresult3,'gresult4':gresult4,'gresult5':gresult5,'gresult6':gresult6,'gresult7':gresult7,'gresult8':gresult8,'gresult9':gresult9,'gresult10':gresult10,
+    'date1':date1,'date2':date2,'date3':date3,'date4':date4,'date5':date5
     })
