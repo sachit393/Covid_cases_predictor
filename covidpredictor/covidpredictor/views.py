@@ -1,0 +1,148 @@
+from django.shortcuts import render
+import pickle
+import json as simplejson
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from statsmodels.tsa.arima_model import ARIMA
+
+import bs4, requests, csv
+from datetime import datetime, date,timedelta
+
+# our home page view
+def home(request):
+    return render(request, 'index.html')
+
+
+# custom method for generating predictions
+def getPredictions():
+
+    fitted_model = pickle.load(open("covidpredictor/model.sav", "rb"))
+    # scaled = pickle.load(open("scaler.sav", "rb"))
+    df = pd.read_csv('covidpredictor/Covid 19 Confirmed Cases-Kerala.csv',index_col='Date',parse_dates=True)
+    df.index.freq='D'
+    # print(len(df.loc['2020-06-01':]))
+    prediction =fitted_model.predict(len(df.loc['2020-06-01':]),len(df.loc['2020-06-01':])+5,typ='levels')
+    print(prediction)
+    return prediction
+# our result page view
+
+# dates = getPredictions().index
+# cases = getPredictions().to_list()
+# data_list=[['Date','Active Cases']]
+# for i in range(0,len(cases)):
+#     data_list.append([dates[i].date().strftime('%Y-%m-%d'),cases[i]])
+# print(data_list)
+
+def result(request):
+
+    res = requests.get("https://dashboard.kerala.gov.in/covid/index.php")
+
+    soup = bs4.BeautifulSoup(res.text, "html.parser")
+
+    dailyCasesTag = soup.select("body > div > div.content-wrapper > section.content > div > div:nth-child(1) > div.col-lg-8.col-12 > div > div:nth-child(1) > div > div.inner > h3 > sup")
+
+    dailyCasesUnedited = dailyCasesTag[0].text
+    dailyCasesEdited_1 = dailyCasesUnedited[1:len(dailyCasesUnedited) - 1]
+    dailyCases = dailyCasesEdited_1[1:]
+    currentDate = str(date.today()-timedelta(days = 1))
+    print(currentDate)
+    ####################################
+    def updateCase(currentDate, dailyCases, oldDataList):
+      f = open("covidpredictor/Covid 19 Confirmed Cases-Kerala.csv", "wt")
+      for line in oldDataList:
+        f.write(line)
+        f.write("\n")
+
+      if currentDate == oldDataList[len(oldDataList)-1][:10]:
+          f.close()
+      else:
+          f.write(currentDate +"," + dailyCases)
+          f.write("\n")
+          f.close()
+
+    def getHistoricalData():
+      a_file = open("covidpredictor/Covid 19 Confirmed Cases-Kerala.csv", "r")
+
+      list_of_lists = []
+      for line in a_file:
+        stripped_line = line.strip()
+        # line_list = stripped_line.split()
+        list_of_lists.append(stripped_line)
+
+      a_file.close()
+      return list_of_lists
+
+    oldDataList = getHistoricalData()
+    updateCase(currentDate, dailyCases, oldDataList)
+    ##################################################
+    temp_df = pd.read_csv('covidpredictor/Covid 19 Confirmed Cases-Kerala.csv',index_col='Date',parse_dates=True)
+    temp_df.index.freq='D'
+    temp_df=temp_df.loc['2020-06-01':]
+    from matplotlib.pyplot import figure
+
+    figure(figsize=(16, 12), dpi=80)
+    plt.plot(temp_df['Confirmed'],color='red',)
+    plt.title('No of daily new cases from June 2020 till now in Kerela')
+    plt.savefig('static/data.png')
+    # plt.show()
+    # print(len(temp_df))
+
+    # MAKING ARIMA MODEL
+
+    model = ARIMA(temp_df['Confirmed'],order=(2,1,5))
+    fitted_model = model.fit()
+
+    import pickle
+    pickle.dump(fitted_model,open("covidpredictor/model.sav", "wb"))
+
+    dates = getPredictions().index
+    cases = getPredictions().to_list()
+    data_list=[]
+    # print(dates)
+    for i in range(0,len(cases)):
+        data_list.append([dates[i].date().strftime('%Y-%m-%d'),cases[i]])
+    # for item in result:
+    gdate1 = temp_df.index[-10].date().strftime('%Y-%m-%d')
+    gdate2 = temp_df.index[-9].date().strftime('%Y-%m-%d')
+    gdate3 = temp_df.index[-8].date().strftime('%Y-%m-%d')
+    gdate4 = temp_df.index[-7].date().strftime('%Y-%m-%d')
+    gdate5 = temp_df.index[-6].date().strftime('%Y-%m-%d')
+    gdate6 = temp_df.index[-5].date().strftime('%Y-%m-%d')
+    gdate7 = temp_df.index[-4].date().strftime('%Y-%m-%d')
+    gdate8 = temp_df.index[-3].date().strftime('%Y-%m-%d')
+    gdate9 = temp_df.index[-2].date().strftime('%Y-%m-%d')
+    gdate10 = temp_df.index[-1].date().strftime('%Y-%m-%d')
+    # gdate11= temp_df.index[0].date().strftime('%Y-%m-%d')
+    #############
+    gresult1 = temp_df['Confirmed'][-10]
+    gresult2 = temp_df['Confirmed'][-9]
+    gresult3 = temp_df['Confirmed'][-8]
+    gresult4 = temp_df['Confirmed'][-7]
+    gresult5 = temp_df['Confirmed'][-6]
+    gresult6 = temp_df['Confirmed'][-5]
+    gresult7 = temp_df['Confirmed'][-4]
+    gresult8 = temp_df['Confirmed'][-3]
+    gresult9 = temp_df['Confirmed'][-2]
+    gresult10 = temp_df['Confirmed'][-1]
+    # gresult11= temp_df['Confirmed'][0]
+    print(gresult10)
+    result1 = data_list[0][1]
+    result2 = data_list[1][1]
+    result3 = data_list[2][1]
+    result4 = data_list[3][1]
+    result5 = data_list[4][1]
+    print(data_list)
+    date1 = data_list[0][0]
+
+    date2 = data_list[1][0]
+    date3 = data_list[2][0]
+    date4 = data_list[3][0]
+    date5 = data_list[4][0]
+
+
+    return render(request, 'result.html', {'result1':result1,'result2':result2,'result3':result3,'result4':result4,'result5':result5,
+    'date1':date1,'date2':date2,'date3':date3,'date4':date4,'date5':date5,
+    'gdate1':gdate1,'gdate2':gdate2,'gdate3':gdate3,'gdate4':gdate4,'gdate5':gdate5,'gdate6':gdate6,'gdate7':gdate7,'gdate8':gdate8,'gdate9':gdate9,'gdate10':gdate10,
+    'gresult1':gresult1,'gresult2':gresult2,'gresult3':gresult3,'gresult4':gresult4,'gresult5':gresult5,'gresult6':gresult6,'gresult7':gresult7,'gresult8':gresult8,'gresult9':gresult9,'gresult10':gresult10,
+    })

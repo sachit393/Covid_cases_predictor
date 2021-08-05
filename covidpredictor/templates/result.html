@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" dir="ltr">
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      // console.log({{result}})
+      // {result}
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+
+          ['Date','New Cases'],
+          ['{{date1}}',{{result1}}],
+          ['{{date2}}',{{result2}}],
+          ['{{date3}}',{{result3}}],
+          ['{{date4}}',{{result4}}],
+          ['{{date5}}',{{result5}}],
+
+        ]);
+
+        var options = {
+          title: 'Forecasted New Cases',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+
+
+    <meta charset="utf-8">
+    <title>Results</title>
+  </head>
+  <body>
+    <div id="curve_chart" style="width: 1300px; height: 800px"></div>
+    <img src="{% static 'data.png' %}" alt="My image">
+  </body>
+</html>
