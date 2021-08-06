@@ -10,3 +10,13 @@ An ARIMA model to forecast COVID-19 cases(new ones) in Kerela five days in futur
   <br>
   <li>Forecasts are plotted by using Google charts and plot of the existing data(on which model is trained) is made using matplotlib</li>
 </ul>
+<br>
+<h2>STEPS TO RUN</h2>
+<br>
+<ul>
+  
+  <li>Clone the repository</li>
+  <li>Install pandas,numpy,matplotlib,statsmodels,beautiful soup and Django using pip</li>
+  <li>CD into covidpredictor(Topmost) directory</li>
+  <li>Run the command "python manage.py runserver" in the command line</li>
+</ul>
