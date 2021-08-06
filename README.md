@@ -16,7 +16,9 @@ An ARIMA model to forecast COVID-19 cases(new ones) in Kerela five days in futur
 <ul>
   
   <li>Clone the repository</li>
-  <li>Install pandas,numpy,matplotlib,statsmodels,beautiful soup and Django using pip</li>
+  <li>Install pandas,numpy,matplotlib,statsmodels,beautiful soup,bs4 and Django(and any other for which you encounter an error :) ) using pip</li>
   <li>CD into covidpredictor(Topmost) directory</li>
   <li>Run the command "python manage.py runserver" in the command line</li>
 </ul>
+
+<strong>Special Thanks to shabir-dhillon for scrapping the latest data using Beautiful Soup</strong>
