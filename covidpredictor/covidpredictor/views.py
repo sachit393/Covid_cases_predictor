@@ -50,7 +50,7 @@ def result(request):
         f.write(line)
         f.write("\n")
 
-      if currentDate == oldDataList[len(oldDataList)-1][:10]:
+      if currentDate == oldDataList[len(oldDataList)-1][:10] or currentDate == oldDataList[len(oldDataList)-2][:10] or currentDate == oldDataList[len(oldDataList)-3][:10] or currentDate == oldDataList[len(oldDataList)-4][:10]:
           f.close()
       else:
           f.write(currentDate +"," + dailyCases)
